@@ -156,8 +156,8 @@
   }
   .rt-btn-calc:hover { opacity: 0.9; }
 
-  /* 戻るボタン（旧閉じるボタン） */
-  .rt-btn-back {
+  /* 閉じるボタン（旧戻るボタン） */
+  .rt-btn-close {
     display: block;
     width: 100%;
     margin-top: 16px; /* 計算結果等から少し離す */
@@ -174,7 +174,7 @@
     text-decoration: none;
     appearance: none;
   }
-  .rt-btn-back:hover {
+  .rt-btn-close:hover {
     background: #e2e8f0;
     color: var(--ink);
   }
@@ -277,8 +277,8 @@
       </div>
     </div>
 
-    <!-- 戻るボタン -->
-    <button type="button" id="rt_btnBack" class="rt-btn-back">元のページに戻る</button>
+    <!-- 閉じるボタン -->
+    <button type="button" id="rt_btnClose" class="rt-btn-close">ウィンドウを閉じる</button>
 
   </div>
 </div>
@@ -294,7 +294,7 @@
 
       // ID取得
       const btn = document.getElementById('rt_btnRun');
-      const backBtn = document.getElementById('rt_btnBack'); // IDを変更しました
+      const closeBtn = document.getElementById('rt_btnClose'); // IDをbtnCloseに戻しました
       const sInput = document.getElementById('rt_sales');
       const mInput = document.getElementById('rt_margin');
       const dInput = document.getElementById('rt_months');
@@ -364,12 +364,12 @@
         resultContainer.style.display = 'block';
       });
 
-      // 戻るボタンクリック時（ブラウザの履歴を戻る）
-      if(backBtn){
-        backBtn.addEventListener('click', function(e){
+      // 閉じるボタンクリック時（ウィンドウを閉じる）
+      if(closeBtn){
+        closeBtn.addEventListener('click', function(e){
            e.preventDefault();
-           // ブラウザの「戻る」ボタンと同じ動作を実行
-           window.history.back();
+           // 別タブで開かれた場合はこれで閉じます
+           window.close(); 
         });
       }
 
