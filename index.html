@@ -156,8 +156,8 @@
   }
   .rt-btn-calc:hover { opacity: 0.9; }
 
-  /* 閉じるボタン */
-  .rt-btn-close {
+  /* 戻るボタン（旧閉じるボタン） */
+  .rt-btn-back {
     display: block;
     width: 100%;
     margin-top: 16px; /* 計算結果等から少し離す */
@@ -174,7 +174,7 @@
     text-decoration: none;
     appearance: none;
   }
-  .rt-btn-close:hover {
+  .rt-btn-back:hover {
     background: #e2e8f0;
     color: var(--ink);
   }
@@ -277,8 +277,8 @@
       </div>
     </div>
 
-    <!-- 閉じるボタン -->
-    <button type="button" id="rt_btnClose" class="rt-btn-close">閉じる</button>
+    <!-- 戻るボタン -->
+    <button type="button" id="rt_btnBack" class="rt-btn-back">元のページに戻る</button>
 
   </div>
 </div>
@@ -294,7 +294,7 @@
 
       // ID取得
       const btn = document.getElementById('rt_btnRun');
-      const closeBtn = document.getElementById('rt_btnClose');
+      const backBtn = document.getElementById('rt_btnBack'); // IDを変更しました
       const sInput = document.getElementById('rt_sales');
       const mInput = document.getElementById('rt_margin');
       const dInput = document.getElementById('rt_months');
@@ -364,11 +364,12 @@
         resultContainer.style.display = 'block';
       });
 
-      // 閉じるボタンクリック時（タブを閉じる）
-      if(closeBtn){
-        closeBtn.addEventListener('click', function(e){
+      // 戻るボタンクリック時（ブラウザの履歴を戻る）
+      if(backBtn){
+        backBtn.addEventListener('click', function(e){
            e.preventDefault();
-           window.close(); 
+           // ブラウザの「戻る」ボタンと同じ動作を実行
+           window.history.back();
         });
       }
 
