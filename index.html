@@ -156,8 +156,8 @@
   }
   .rt-btn-calc:hover { opacity: 0.9; }
 
-  /* 閉じるボタン（旧戻るボタン） */
-  .rt-btn-close {
+  /* 戻るボタン（aタグ用スタイル） */
+  a.rt-btn-close {
     display: block;
     width: 100%;
     margin-top: 16px; /* 計算結果等から少し離す */
@@ -174,7 +174,7 @@
     text-decoration: none;
     appearance: none;
   }
-  .rt-btn-close:hover {
+  a.rt-btn-close:hover {
     background: #e2e8f0;
     color: var(--ink);
   }
@@ -277,8 +277,8 @@
       </div>
     </div>
 
-    <!-- 閉じるボタン -->
-    <button type="button" id="rt_btnClose" class="rt-btn-close">ウィンドウを閉じる</button>
+    <!-- 戻るボタン (リンク) -->
+    <a href="https://www.matsumoto-kaikei.or.jp/digital-merit#:~:text=%E2%80%BB%E3%82%82%E3%81%97%E5%88%A9%E7%9B%8A%E7%8E%87%E3%81%AE%E6%82%AA%E5%8C%96%E3%81%AB3%E3%83%B6%E6%9C%88%E6%B0%97%E4%BB%98%E3%81%91%E3%81%AA%E3%81%8B%E3%81%A3%E3%81%9F%E3%82%8C%E2%80%A6%20%E2%86%92%20%E3%80%90%E6%9C%88%E6%AC%A1%E6%B1%BA%E7%AE%97%E3%81%AE%E9%81%85%E3%82%8C%E3%81%AB%E3%82%88%E3%82%8B%E6%90%8D%E5%A4%B1%E8%A8%BA%E6%96%AD%E3%80%91" class="rt-btn-close">戻る</a>
 
   </div>
 </div>
@@ -294,7 +294,6 @@
 
       // ID取得
       const btn = document.getElementById('rt_btnRun');
-      const closeBtn = document.getElementById('rt_btnClose'); // IDをbtnCloseに戻しました
       const sInput = document.getElementById('rt_sales');
       const mInput = document.getElementById('rt_margin');
       const dInput = document.getElementById('rt_months');
@@ -363,15 +362,6 @@
         
         resultContainer.style.display = 'block';
       });
-
-      // 閉じるボタンクリック時（ウィンドウを閉じる）
-      if(closeBtn){
-        closeBtn.addEventListener('click', function(e){
-           e.preventDefault();
-           // 別タブで開かれた場合はこれで閉じます
-           window.close(); 
-        });
-      }
 
       // UX: フォーカス時に全選択
       [sInput, mInput, dInput, wInput].forEach(el => {
