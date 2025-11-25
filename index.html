@@ -364,15 +364,11 @@
         resultContainer.style.display = 'block';
       });
 
-      // 閉じるボタンクリック時
+      // 閉じるボタンクリック時（タブを閉じる）
       if(closeBtn){
         closeBtn.addEventListener('click', function(e){
            e.preventDefault();
-           // ウィジェットのコンテナ（全体）を非表示にする
-           const container = document.querySelector('.rt-widget-container');
-           if(container) {
-             container.style.display = 'none';
-           }
+           window.close(); 
         });
       }
 
