@@ -7,403 +7,391 @@
 <meta name="description" content="月次決算の遅れによる経済的損失を簡易診断するツールです。">
 
 <style>
-  /* Ver 3.0 と共通のカラースキーム・トンマナ */
+  /* ベース設定 */
   :root{
     --bg:#f4f9fb;
     --card:#ffffff;
     --ink:#1e2a2d;
     --muted:#5a6a6d;
-    --accent:#578899;       /* 松本会計カラー */
+    --accent:#578899;
     --accent-soft:#7aa2b0;
-    --accent-pale:rgba(87,136,153,0.1);
-    --danger:#b45309;       /* 警告色 */
+    --danger:#b45309;
     --danger-bg:#fff8f6;
     --danger-border:#eecbc0;
-    --shadow:0 10px 30px rgba(35,80,90,.12);
     --border-color:#cbd5e1;
-    --line:#e7eef3;
+    --shadow:0 4px 12px rgba(35,80,90,.08);
   }
 
   *{box-sizing:border-box;}
 
-  body{
-    margin:0;
+  /* 埋め込み時のスタイル干渉を防ぐため、ウィジェット内のみにスタイルを適用するクラス設計 */
+  .rt-widget-container {
     font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif;
-    background:var(--bg);
     color:var(--ink);
-    line-height:1.6;
-    -webkit-font-smoothing: antialiased;
-    /* 中央寄せ配置用 */
+    line-height:1.4;
+    width: 100%;
     display: flex;
     justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 20px;
   }
 
-  /* Widget Container */
-  .widget-card {
+  /* コンパクトウィジェット */
+  .rt-widget-compact {
     background: var(--card);
     width: 100%;
-    max-width: 440px; /* コンパクトに */
-    border-radius: 16px;
+    max-width: 480px;
+    border-radius: 12px;
     box-shadow: var(--shadow);
-    padding: 32px 24px;
-    border: 1px solid rgba(255,255,255,0.5);
+    padding: 20px 16px;
+    border: 1px solid #e2e8f0;
     position: relative;
     overflow: hidden;
+    margin: 0 auto;
   }
 
-  /* Decorative top bar */
-  .widget-card::before {
+  /* 上部のアクセントバー */
+  .rt-widget-compact::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
-    height: 6px;
+    height: 4px;
     background: linear-gradient(135deg,var(--accent),var(--accent-soft));
   }
 
-  /* Typography */
-  h2 {
-    margin: 0 0 8px;
-    font-size: 1.25rem;
+  .rt-widget-compact h2 {
+    margin: 0 0 12px;
+    font-size: 1.1rem;
     font-weight: 700;
     text-align: center;
     color: var(--ink);
-    letter-spacing: 0.03em;
   }
   
-  .lead {
-    margin: 0 0 24px;
-    font-size: 0.85rem;
-    color: var(--muted);
-    text-align: center;
-    line-height: 1.5;
-  }
-
-  /* Form Elements */
-  .input-group {
+  /* 2列グリッドレイアウト */
+  .rt-input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 10px;
     margin-bottom: 16px;
   }
 
-  label {
+  .rt-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  /* ラベルのスタイル */
+  .rt-input-group label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--muted);
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--ink);
-    margin-bottom: 6px;
+    align-items: center;
+    white-space: nowrap;
+    margin: 0;
   }
-  
-  .unit {
-    font-size: 0.75rem;
-    color: var(--muted);
+  .rt-input-group label span.unit {
     font-weight: normal;
+    font-size: 0.7rem;
+    color: #94a3b8;
   }
 
-  input[type="text"],
-  input[type="number"] {
+  /* 入力欄のスタイル */
+  .rt-widget-compact input[type="text"],
+  .rt-widget-compact input[type="number"] {
     width: 100%;
-    padding: 12px 14px;
-    border-radius: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
     border: 1px solid var(--border-color);
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     font-family: inherit;
-    background: #f9fafb;
+    background: #f8fafc;
     text-align: right;
     color: var(--ink);
-    transition: all 0.2s ease;
-    font-weight: 700;
+    font-weight: 600;
+    transition: all 0.2s;
+    margin: 0;
+    box-shadow: none;
   }
-
-  input:focus {
+  .rt-widget-compact input:focus {
     outline: none;
     border-color: var(--accent);
-    background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(87,136,153,.15);
+    background: #fff;
+    box-shadow: 0 0 0 2px rgba(87,136,153,.1);
   }
   
-  input::placeholder {
-    color: #cbd5e1;
+  /* プレースホルダー（入力例）の色 */
+  .rt-widget-compact input::placeholder {
+    color: rgba(90, 106, 109, 0.35); /* 薄いグレー */
     font-weight: normal;
   }
 
-  /* Divider */
-  hr.divider {
-    border: none;
-    border-top: 1px dashed #e2e8f0;
-    margin: 20px 0;
+  /* リスクシナリオ入力（赤枠） */
+  .rt-risk-input input {
+    border-color: var(--danger-border) !important;
+    background: var(--danger-bg) !important;
+    color: var(--danger) !important;
+  }
+  .rt-risk-input label {
+    color: var(--danger) !important;
   }
 
-  /* Main Action Button */
-  .btn-calc {
+  /* 計算ボタン */
+  .rt-btn-calc {
     display: block;
     width: 100%;
-    margin-top: 24px;
-    background: linear-gradient(135deg,var(--accent),var(--accent-soft));
+    background: var(--accent);
     color: #ffffff;
-    padding: 14px;
-    text-align: center;
+    padding: 10px;
     border-radius: 99px;
     font-weight: 700;
-    font-size: 1rem;
-    box-shadow: 0 4px 12px rgba(87,136,153,.4);
-    transition: transform 0.2s, box-shadow 0.2s;
+    font-size: 0.9rem;
     border: none;
     cursor: pointer;
-    line-height: 1.3;
-  }
-  
-  .btn-calc:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(87,136,153,.5);
-  }
-  
-  .btn-calc:active {
-    transform: translateY(0) scale(0.98);
-  }
-
-  /* Result Area (Hidden initially) */
-  #resultContainer {
-    display: none;
-    margin-top: 32px;
-    border-top: 1px dashed #e2e8f0;
-    padding-top: 24px;
-    animation: fadeIn 0.5s ease;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .scenario-box {
-    background: var(--danger-bg);
-    border: 1px dashed var(--danger-border);
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 20px;
-    font-size: 0.9rem;
-    color: var(--danger);
-    line-height: 1.6;
-  }
-  
-  .scenario-title {
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 4px;
-    font-size: 0.95rem;
-  }
-
-  .result-area {
+    transition: opacity 0.2s;
+    margin-top: 4px;
     text-align: center;
-    margin-bottom: 24px;
+    text-decoration: none;
+    appearance: none;
   }
-  
-  .result-label {
-    font-size: 0.85rem;
+  .rt-btn-calc:hover { opacity: 0.9; }
+
+  /* 閉じるボタン */
+  .rt-btn-close {
+    display: block;
+    width: 100%;
+    margin-top: 16px; /* 計算結果等から少し離す */
+    background: #f1f5f9; /* 背景色を目立たないグレーに */
     color: var(--muted);
-    margin-bottom: 4px;
+    padding: 10px;
+    border-radius: 99px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    text-decoration: none;
+    appearance: none;
   }
-  
-  .result-value {
-    font-size: 2.2rem;
+  .rt-btn-close:hover {
+    background: #e2e8f0;
+    color: var(--ink);
+  }
+
+  /* 結果表示エリア */
+  #rt_resultContainer {
+    display: none;
+    margin-top: 20px;
+    border-top: 1px dashed #e2e8f0;
+    padding-top: 16px;
+    animation: fadeIn 0.4s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+  .rt-scenario-msg {
+    font-size: 0.8rem;
+    color: var(--danger);
+    background: var(--danger-bg);
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    line-height: 1.5;
+    border: 1px dashed var(--danger-border);
+  }
+
+  .rt-result-area {
+    text-align: center;
+  }
+  .rt-result-label { font-size: 0.75rem; color: var(--muted); }
+  .rt-result-value {
+    font-size: 1.8rem;
     font-weight: 800;
     color: var(--danger);
     line-height: 1.1;
-    font-feature-settings: "palt";
-    letter-spacing: -0.02em;
+    margin: 4px 0;
   }
-  
-  .result-sub {
-    font-size: 0.75rem;
-    color: var(--muted);
-    margin-top: 8px;
-  }
+  .rt-result-sub { font-size: 0.7rem; color: var(--muted); }
 
-  /* Secondary Link */
-  .link-full {
-    display: block;
-    text-align: center;
-    font-size: 0.9rem;
-    color: var(--accent);
-    text-decoration: none;
-    font-weight: bold;
-    padding: 12px;
-    border-radius: 8px;
-    background: #f0f7fa;
-    border: 1px solid rgba(87,136,153, 0.2);
-    transition: background 0.2s;
+  /* スマートフォン調整 */
+  @media (max-width: 360px) {
+    .rt-input-grid { grid-template-columns: 1fr; gap: 8px; }
   }
-  .link-full:hover {
-    background: #e1f0f5;
-  }
-
 </style>
 </head>
 <body>
 
-<!-- ウィジェット本体 -->
-<div class="widget-card">
-  <h2>月次決算の遅れによる損失診断</h2>
-  <p class="lead">
-    「試算表ができるまで時間がかかる」<br>
-    そのタイムラグによる損失リスクを試算します。
-  </p>
-
-  <!-- 入力フォーム -->
-  <form id="calcForm" autocomplete="off">
-    <div class="input-group">
-      <label for="simpleSales">
-        <span>年間売上高</span>
-        <span class="unit">円</span>
-      </label>
-      <input type="text" id="simpleSales" inputmode="numeric" placeholder="例: 300,000,000" required>
-    </div>
-
-    <div class="input-group">
-      <label for="simpleMargin">
-        <span>現在の限界利益率</span>
-        <span class="unit">％</span>
-      </label>
-      <input type="number" id="simpleMargin" inputmode="decimal" placeholder="例: 40" min="0" max="100" step="0.1" required>
-    </div>
-
-    <div class="input-group">
-      <label for="delayMonths">
-        <span>月次決算の遅れ</span>
-        <span class="unit">ヶ月</span>
-      </label>
-      <input type="number" id="delayMonths" inputmode="decimal" placeholder="例: 2" min="0" max="12" step="0.5" required>
-    </div>
-
-    <hr class="divider">
+<div class="rt-widget-container">
+  <div class="rt-widget-compact">
+    <h2>月次決算の遅れによる損失診断</h2>
     
-    <div class="input-group">
-      <label for="worseRate" style="color:var(--danger);">
-        <span>想定する悪化率（リスクシナリオ）</span>
-        <span class="unit">％</span>
-      </label>
-      <input type="number" id="worseRate" inputmode="decimal" value="5.0" min="0.1" max="100" step="0.1" required style="border-color:var(--danger-border); background:var(--danger-bg);">
-      <div style="font-size:0.75rem; color:var(--muted); margin-top:4px; text-align:right;">
-        ※原価高騰や不正等で利益率が落ちる幅
+    <div id="rt_calcForm">
+      <div class="rt-input-grid">
+        <!-- 1行目左: 売上 -->
+        <div class="rt-input-group">
+          <label for="rt_sales">
+            <span>年間売上高</span> <span class="unit">円</span>
+          </label>
+          <input type="text" id="rt_sales" inputmode="numeric" placeholder="300,000,000">
+        </div>
+
+        <!-- 1行目右: 利益率 -->
+        <div class="rt-input-group">
+          <label for="rt_margin">
+            <span>限界利益率</span> <span class="unit">％</span>
+          </label>
+          <input type="number" id="rt_margin" inputmode="decimal" placeholder="40" step="0.1">
+        </div>
+
+        <!-- 2行目左: 遅れ -->
+        <div class="rt-input-group">
+          <label for="rt_months">
+            <span>月次決算の遅れ</span> <span class="unit">ヶ月</span>
+          </label>
+          <input type="number" id="rt_months" inputmode="decimal" placeholder="2" step="0.1">
+        </div>
+
+        <!-- 2行目右: 悪化率 (リスク設定) -->
+        <div class="rt-input-group rt-risk-input">
+          <label for="rt_worseRate">
+            <span>想定悪化率</span> <span class="unit">％</span>
+          </label>
+          <input type="number" id="rt_worseRate" inputmode="decimal" value="5.0" step="0.1">
+        </div>
+      </div>
+
+      <!-- 診断ボタン -->
+      <button type="button" id="rt_btnRun" class="rt-btn-calc">診断する</button>
+    </div>
+
+    <!-- 結果エリア -->
+    <div id="rt_resultContainer">
+      <div class="rt-scenario-msg">
+        ⚠️ 限界利益率が <strong><span id="rt_dispWorseRate">5</span>%悪化</strong> し、その発見が <strong><span id="rt_dispMonths">--</span>ヶ月遅れた</strong> 場合の損失
+      </div>
+
+      <div class="rt-result-area">
+        <div class="rt-result-label">あなたの会社の推定損失額</div>
+        <div id="rt_resultValue" class="rt-result-value">0<span style="font-size:0.5em; color:#1e2a2d; font-weight:normal; margin-left:2px;">円</span></div>
+        <div class="rt-result-sub">この利益は、二度と戻ってきません。</div>
       </div>
     </div>
 
-    <button type="submit" class="btn-calc">診断する</button>
-  </form>
+    <!-- 閉じるボタン -->
+    <button type="button" id="rt_btnClose" class="rt-btn-close">閉じる</button>
 
-  <!-- 結果表示エリア -->
-  <div id="resultContainer">
-    
-    <!-- シナリオ提示 -->
-    <div class="scenario-box">
-      <div class="scenario-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-        もし異常発生に気づくのが遅れたら…
-      </div>
-      <div>
-        限界利益率が <strong style="text-decoration:underline;"><span id="dispWorseRate">5</span>%悪化</strong> し、それに気づくのが <strong id="dispMonths">--</strong> ヶ月遅れた場合の推定損失
-      </div>
-    </div>
-
-    <div class="result-area">
-      <div class="result-label">あなたの会社の推定損失額</div>
-      <div id="resultValue" class="result-value">0<span style="font-size:0.6em; margin-left:4px; color:var(--ink);">円</span></div>
-      <div class="result-sub">この利益は、二度と戻ってきません。</div>
-    </div>
-
-    <!-- 詳細へ誘導 -->
-    <a href="#" class="link-full" onclick="alert('ここから詳細シミュレーター（Ver 3.0）のページへ遷移します'); return false;">
-      詳細な経済効果をシミュレーションする &rarr;
-    </a>
   </div>
-
 </div>
 
 <script>
   (function(){
-    const form = document.getElementById('calcForm');
-    const sInput = document.getElementById('simpleSales');
-    const mInput = document.getElementById('simpleMargin');
-    const dInput = document.getElementById('delayMonths');
-    const wInput = document.getElementById('worseRate');
-    
-    const resultContainer = document.getElementById('resultContainer');
-    const rVal = document.getElementById('resultValue');
-    const dMonths = document.getElementById('dispMonths');
-    const dWorseRate = document.getElementById('dispWorseRate');
+    // 二重初期化を防ぐフラグ
+    var isRtWidgetInitialized = false;
 
-    // フォーマット関数
-    function formatMoney(num){
-      return num.toLocaleString('ja-JP');
-    }
+    // 初期化関数
+    function initWidget() {
+      if (isRtWidgetInitialized) return;
 
-    function parseMoney(val){
-      if(!val) return 0;
-      const s = String(val).replace(/,/g, '').trim();
-      const n = parseFloat(s);
-      return isNaN(n) ? 0 : n;
-    }
+      // ID取得
+      const btn = document.getElementById('rt_btnRun');
+      const closeBtn = document.getElementById('rt_btnClose');
+      const sInput = document.getElementById('rt_sales');
+      const mInput = document.getElementById('rt_margin');
+      const dInput = document.getElementById('rt_months');
+      const wInput = document.getElementById('rt_worseRate');
+      const resultContainer = document.getElementById('rt_resultContainer');
+      const rVal = document.getElementById('rt_resultValue');
+      
+      // ボタンか入力欄が見つからない場合は、まだHTMLが準備できていないため何もしない
+      if (!btn || !sInput) return;
 
-    // カンマ編集
-    sInput.addEventListener('input', function(e){
-      const originalVal = this.value;
-      const raw = originalVal.replace(/[^0-9]/g, '');
-      if(raw === "") {
-         this.value = "";
-         return;
-      }
-      const num = parseFloat(raw);
-      if(!isNaN(num)){
-        const formatted = num.toLocaleString('ja-JP');
-        if(originalVal !== formatted){
-            this.value = formatted;
+      // 要素が見つかったので初期化を実行
+      isRtWidgetInitialized = true;
+
+      // 入力値取得用ヘルパー
+      const getVal = (el) => parseFloat(el.value) || 0;
+
+      // カンマ区切りフォーマット関数
+      function formatInputMoney(inputElement) {
+        let val = inputElement.value;
+        // 全角を半角に
+        val = val.replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0));
+        // 数字以外を除去
+        const raw = val.replace(/[^0-9]/g, '');
+        
+        if(raw === "") return;
+        
+        const num = parseInt(raw, 10);
+        if(!isNaN(num)){
+          const formatted = num.toLocaleString('ja-JP');
+          if(inputElement.value !== formatted){
+              inputElement.value = formatted;
+          }
         }
       }
-    });
 
-    // 計算実行
-    form.addEventListener('submit', function(e){
-      e.preventDefault(); // ページリロード防止
-      
-      const sales = parseMoney(sInput.value);
-      const months = parseFloat(dInput.value) || 0;
-      const worseRate = parseFloat(wInput.value) || 0;
-      
-      if(sales === 0 || months === 0){
-          alert("売上高と遅れ月数を入力してください");
-          return;
+      // イベントリスナー: 売上入力時（inputイベントでリアルタイム反映）
+      sInput.addEventListener('input', function(e){
+        formatInputMoney(this);
+      });
+      // 念のためblur時にも発火
+      sInput.addEventListener('blur', function(e){
+        formatInputMoney(this);
+      });
+
+      // 計算実行ボタンクリック時
+      btn.addEventListener('click', function(e){
+        e.preventDefault();
+        
+        if(!sInput.value || !mInput.value || !dInput.value || !wInput.value) {
+            alert("すべての項目に数値を入力してください。");
+            return;
+        }
+
+        const salesRaw = sInput.value.replace(/[^0-9]/g, '');
+        const sales = parseInt(salesRaw, 10) || 0;
+        const months = getVal(dInput);
+        const worseRate = getVal(wInput);
+        
+        // 計算
+        const loss = sales * (worseRate / 100) * (months / 12);
+
+        // 表示更新
+        document.getElementById('rt_dispMonths').textContent = months;
+        document.getElementById('rt_dispWorseRate').textContent = worseRate;
+        rVal.innerHTML = Math.round(loss).toLocaleString('ja-JP') + '<span style="font-size:0.5em; color:#1e2a2d; font-weight:normal; margin-left:2px;">円</span>';
+        
+        resultContainer.style.display = 'block';
+      });
+
+      // 閉じるボタンクリック時
+      if(closeBtn){
+        closeBtn.addEventListener('click', function(e){
+           e.preventDefault();
+           // ウィジェットのコンテナ（全体）を非表示にする
+           const container = document.querySelector('.rt-widget-container');
+           if(container) {
+             container.style.display = 'none';
+           }
+        });
       }
 
-      // シナリオロジック:
-      // 損失 = 売上 * 悪化率(%) * (遅れ月数 / 12)
-      // 例: 5%悪化なら 0.05
-      
-      const loss = sales * (worseRate / 100) * (months / 12);
+      // UX: フォーカス時に全選択
+      [sInput, mInput, dInput, wInput].forEach(el => {
+        if(el) el.addEventListener('focus', function(){ this.select(); });
+      });
+    }
 
-      // 表示更新
-      dMonths.textContent = months;
-      dWorseRate.textContent = worseRate;
-      rVal.innerHTML = formatMoney(Math.round(loss)) + '<span style="font-size:0.5em; margin-left:4px; color:var(--ink); font-weight:normal;">円</span>';
-      
-      // 結果エリアを表示
-      resultContainer.style.display = 'block';
-      
-      // スムーズスクロール
-      // 少し遅らせてアニメーションさせる
-      setTimeout(() => {
-          resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }, 100);
-    });
+    // 1. 即時実行を試みる
+    initWidget();
 
-    // 初期フォーカス UX
-    [sInput, mInput, dInput, wInput].forEach(el => {
-      el.addEventListener('focus', function(){ this.select(); });
-    });
+    // 2. DOMContentLoaded で試みる
+    if (document.readyState !== 'complete') {
+      document.addEventListener('DOMContentLoaded', initWidget);
+    }
+
+    // 3. window.onload で念のため試みる
+    window.addEventListener('load', initWidget);
 
   })();
 </script>
